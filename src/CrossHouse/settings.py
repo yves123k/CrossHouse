@@ -28,7 +28,7 @@ EMAIL_PORT = EMAIL_PORT
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
-environ.Env.read_env(env_file = str(BASE_DIR / "CrossHouse" / "venv"))
+environ.Env.read_env(env_file = str(BASE_DIR / "CrosspHouse" / ".env"))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -39,7 +39,10 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env.bool("DEBUG" , False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOST")
-
+print(SECRET_KEY)
+print(DEBUG)
+print(type(DEBUG))
+print(ALLOWED_HOSTS)
 
 # Application definition
 
