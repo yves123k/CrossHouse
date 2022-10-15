@@ -36,7 +36,7 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="blog_left_sidebar">
-                    {% for blog in user_manager %}
+                    {% for blog in blogger %}
                         <article class="row blog_item">
                             <div class="col-md-3">
                                 <div class="blog_info text-right">
@@ -80,8 +80,8 @@
                     <nav class="blog-pagination justify-content-center d-flex">
                         <ul class="pagination">
                             
-                                    {% if user_manager.has_previous %}
-                                        <a href="?page={{ user_manager.previous_page_number }}" class="page-link" aria-label="Previous">
+                                    {% if blogger.has_previous %}
+                                        <a href="?page={{ blogger.previous_page_number }}" class="page-link" aria-label="Previous">
                                             <span aria-hidden="true">
                                                 <span class="lnr lnr-chevron-left"></span>
                                             </span>
@@ -93,8 +93,8 @@
                                             </span>
                                         </a>
                                     {% endif %}
-                                    {% for i in user_manager.paginator.page_range %}
-                                        {% if user_manager.number == i %}
+                                    {% for i in blogger.paginator.page_range %}
+                                        {% if blogger.number == i %}
                                             <li class="page-item active"><a class="page-link">{{ i }}</a></li>
                                         {% else %}
                                             <li class="page-item {% if request.path == '/?page={{ i }}/' %} page-link active {% endif %}"><a  href="?page={{ i }}" class="page-link">{{ i }}</a></li>
@@ -103,16 +103,16 @@
 <!--                                          <li class="page-item d-none d-md-block"><a id="datatablePaginationPage0" data-dt-page-to="0"  class="{% if request.path == '/?page={{ i }}/' %} page-link active {% endif %}" href="?page={{ i }}">{{ i }}</a></li>-->
                                         {% endif %}
                                     {% endfor %}
-                                    {% if user_manager.has_next %}
+                                    {% if blogger.has_next %}
                                         <li class="page-item">
-                                            <a href="?page={{ user_manager.next_page_number }}" class="page-link" aria-label="Next">
+                                            <a href="?page={{ blogger.next_page_number }}" class="page-link" aria-label="Next">
                                                 <span aria-hidden="true">
                                                     <span class="lnr lnr-chevron-right"></span>
                                                 </span>
                                             </a>
                                         </li>
-                                        <!-- <li class="page-item"><a id="datatablePaginationNext" class="page-link" href="?page={{ user_manager.next_page_number }}" aria-label="Next"><i class="gd-angle-right icon-text icon-text-xs d-inline-block"></i></a></li> -->
-<!--                                        <li class="page-item d-none d-md-block"><a id="datatablePaginationPage0" href="?page={{ user_manager.next_page_number }}">&raquo;</a></li>-->
+                                        <!-- <li class="page-item"><a id="datatablePaginationNext" class="page-link" href="?page={{ blogger.next_page_number }}" aria-label="Next"><i class="gd-angle-right icon-text icon-text-xs d-inline-block"></i></a></li> -->
+<!--                                        <li class="page-item d-none d-md-block"><a id="datatablePaginationPage0" href="?page={{ blogger.next_page_number }}">&raquo;</a></li>-->
                                     {% else %}
                                         <li class="page-item">
                                             <a class="page-link" aria-label="Next">

@@ -331,7 +331,7 @@ class BlogView(ListView):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         
-        return render(request, self.template_name, {'user_manager': page_obj})
+        return render(request, self.template_name, {'blogger': page_obj})
 
     # def get_context_data(self,**kwargs):
     #     context = super().get_context_data(**kwargs) 
@@ -513,5 +513,5 @@ def contact_client(self,request,pk):
         email.fail_silently = True
         email.send()
     
-        return redirect('')
+        return redirect('home')
             
