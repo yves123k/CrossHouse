@@ -36,21 +36,26 @@
         <div class="row">
             <div class="col-lg-8">
                 <div class="blog_left_sidebar">
-                    {% for blog in blog %}
+                    {% for blog in user_manager %}
                         <article class="row blog_item">
                             <div class="col-md-3">
                                 <div class="blog_info text-right">
                                     <div class="post_tag">
-                                        <a href="#">Food,</a>
-                                        <a class="active" href="#">Technology,</a>
-                                        <a href="#">Politics,</a>
-                                        <a href="#">Lifestyle</a>
+                                        {% if blog.for_rent %}
+                                            <span class="d-inline-block bg-success text-white px-3 mb-3 property-offer-type rounded">For Rent</span>
+                                            
+                                        {% endif %}    
+                                        {% if blog.on_sale %}
+                                            <span class="d-inline-block bg-danger text-white px-3 mb-3 property-offer-type rounded">For Sale</span>    
+                    
+                                        {% endif %}
+                                        
                                     </div>
                                     <ul class="blog_meta list">
-                                        <li><a href="#">{{ blog.author.username}}<i class="lnr lnr-user"></i></a></li>
+                                        <li><a href="#"><span style="color:black ;">{{ blog.author.username}}</span><i class="lnr lnr-user"></i></a></li>
                                         <li><a href="#">{{ blog.date_created|date:'l j F Y'}}<i class="lnr lnr-calendar-full"></i></a></li>
                                         <li><a href="#">{% get_hit_count for blog %} Views<i class="lnr lnr-eye"></i></a></li>
-                                        <li><a href="#">{{ comments }}comments<i class="lnr lnr-bubble"></i></a></li>
+                                        <li><a href="#"><i class="lnr lnr-bubble"></i></a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -74,14 +79,51 @@
                     {% endfor %}
                     <nav class="blog-pagination justify-content-center d-flex">
                         <ul class="pagination">
-                            <li class="page-item">
-                                <a href="#" class="page-link" aria-label="Previous">
-                                    <span aria-hidden="true">
-                                        <span class="lnr lnr-chevron-left"></span>
-                                    </span>
-                                </a>
-                            </li>
-                            <li class="page-item"><a href="#" class="page-link">01</a></li>
+                            
+                                    {% if user_manager.has_previous %}
+                                        <a href="?page={{ user_manager.previous_page_number }}" class="page-link" aria-label="Previous">
+                                            <span aria-hidden="true">
+                                                <span class="lnr lnr-chevron-left"></span>
+                                            </span>
+                                        </a>
+                                    {% else %}
+                                        <a class="page-link" aria-label="Previous">
+                                            <span aria-hidden="true">
+                                                <span class="lnr lnr-chevron-left"></span>
+                                            </span>
+                                        </a>
+                                    {% endif %}
+                                    {% for i in user_manager.paginator.page_range %}
+                                        {% if user_manager.number == i %}
+                                            <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+                                        {% else %}
+                                            <li class="page-item {% if request.path == '/?page={{ i }}/' %} page-link active {% endif %}"><a  href="?page={{ i }}" class="page-link">{{ i }}</a></li>
+                                            <!-- <li class="page-item d-none d-md-block"><a id="datatablePagination1" class="{% if request.path == '/?page={{ i }}/' %} page-link active {% endif %}" href="?page={{ i }}">{{ i }}</a> -->
+
+<!--                                          <li class="page-item d-none d-md-block"><a id="datatablePaginationPage0" data-dt-page-to="0"  class="{% if request.path == '/?page={{ i }}/' %} page-link active {% endif %}" href="?page={{ i }}">{{ i }}</a></li>-->
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if user_manager.has_next %}
+                                        <li class="page-item">
+                                            <a href="?page={{ user_manager.next_page_number }}" class="page-link" aria-label="Next">
+                                                <span aria-hidden="true">
+                                                    <span class="lnr lnr-chevron-right"></span>
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <!-- <li class="page-item"><a id="datatablePaginationNext" class="page-link" href="?page={{ user_manager.next_page_number }}" aria-label="Next"><i class="gd-angle-right icon-text icon-text-xs d-inline-block"></i></a></li> -->
+<!--                                        <li class="page-item d-none d-md-block"><a id="datatablePaginationPage0" href="?page={{ user_manager.next_page_number }}">&raquo;</a></li>-->
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" aria-label="Next">
+                                                <span aria-hidden="true">
+                                                    <span class="lnr lnr-chevron-right"></span>
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <!-- <li class="page-item d-none d-md-block"><a id="datatablePaginationPage0" class="disabled"><span>&raquo;</span></a></li> -->
+                                    {% endif %}
+                            <!-- <li class="page-item"><a href="#" class="page-link">01</a></li>
                             <li class="page-item active"><a href="#" class="page-link">02</a></li>
                             <li class="page-item"><a href="#" class="page-link">03</a></li>
                             <li class="page-item"><a href="#" class="page-link">04</a></li>
@@ -92,72 +134,19 @@
                                         <span class="lnr lnr-chevron-right"></span>
                                     </span>
                                 </a>
-                            </li>
+                            </li> -->
                         </ul>
                     </nav>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="blog_right_sidebar">
-                    <aside class="single_sidebar_widget search_widget">
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search Posts" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Search Posts'">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button"><i class="lnr lnr-magnifier"></i></button>
-                            </span>
-                        </div><!-- /input-group -->
-                        <div class="br"></div>
-                    </aside>
-                    <aside class="single_sidebar_widget popular_post_widget">
-                        <h3 class="widget_title">Popular Posts</h3>
-                        <div class="media post_item">
-                            <img src="{% static 'img/blog/popular-post/post1.jpg' %}" alt="post">
-                            <div class="media-body">
-                                <a href="blog-details.html">
-                                    <h3>Space The Final Frontier</h3>
-                                </a>
-                                <p>02 Hours ago</p>
-                            </div>
-                        </div>
-                        <div class="media post_item">
-                            <img src="{% static 'img/blog/popular-post/post2.jpg' %}" alt="post">
-                            <div class="media-body">
-                                <a href="blog-details.html">
-                                    <h3>The Amazing Hubble</h3>
-                                </a>
-                                <p>02 Hours ago</p>
-                            </div>
-                        </div>
-                        <div class="media post_item">
-                            <img src="{% static 'img/blog/popular-post/post3.jpg' %}" alt="post">
-                            <div class="media-body">
-                                <a href="blog-details.html">
-                                    <h3>Astronomy Or Astrology</h3>
-                                </a>
-                                <p>03 Hours ago</p>
-                            </div>
-                        </div>
-                        <div class="media post_item">
-                            <img src="{% static 'img/blog/popular-post/post4.jpg' %}" alt="post">
-                            <div class="media-body">
-                                <a href="blog-details.html">
-                                    <h3>Asteroids telescope</h3>
-                                </a>
-                                <p>01 Hours ago</p>
-                            </div>
-                        </div>
-                        <div class="br"></div>
-                    </aside>
-                    <aside class="single_sidebar_widget ads_widget">
-                        <a href="#"><img class="img-fluid" src="{% static 'img/blog/add.jpg' %}" alt=""></a>
-                        <div class="br"></div>
-                    </aside>
                     <aside class="single-sidebar-widget tag_cloud_widget" style="margin-bottom:70px;">
                         <h4 class="widget_title">Tag Clouds</h4>
                         <ul class="list">
-                            <li><a href="#">All</a></li>
-                            <li><a href="#">Rent</a></li>
-                            <li><a href="#">Sale</a></li> 
+                            <li><a href="?search=all">All</a></li>
+                            <li><a href="?search=rent">Rent</a></li>
+                            <li><a href="?search=sale">Sale</a></li> 
                         </ul>
                     </aside>
                     

@@ -72,7 +72,7 @@
                                                 <li><a href="#">Sale Price<span>${{blog_detail.price_on_sale}}</span></a></li>
                                             {% endif %}
                                             {% if blog_detail.for_rent %}    
-                                                <li><a href="#">Rent Price <span>${{blog_detail.price_for_rent}}</span></a></li>
+                                                <li><a href="#">Rent Price/month <span>${{blog_detail.price_for_rent}}</span></a></li>
                                             {% endif %}
                                             <li><a href="#">Prix <span>${{blog_detail.price}}</span></a></li>    
                                             <li><a href="#">Total <span>${{blog_detail.price}}</span></a></li>
@@ -90,7 +90,11 @@
                             <div class="single-comment justify-content-between d-flex">
                                 <div class="user justify-content-between d-flex">
                                     <div class="thumb">
-                                        <img style="width:60px;height:60px ;" src="{{comment.author_comment.photo.url}}" alt="">
+                                        {% if comment.author_comment.photo %}
+                                            <img style="width:60px;height:60px ;" src="{{comment.author_comment.photo.url}}" alt="">
+                                        {% else %}    
+                                            <img style="width:60px;height:60px ;" src="{% static 'img/user.png' %}" alt="">
+                                        {% endif %}    
                                     </div>
                                     <div class="desc">
                                         <h5><a href="#">{{ comment.author_comment.username }}</a></h5>
@@ -101,8 +105,17 @@
                                     </div>
                                 </div>
                                 <div class="reply-btn">
-                                    <a href="" class="btn-reply text-uppercase">reply</a>
+                                        <a href="" class="btn-reply text-uppercase">reply</a>
+                                    <form method="POST" action="{% url 'delete_comment' comment.id %}">
+                                        {% csrf_token %}
+                                        {% if comment.author_comment.username == request.user.username %}
+                                            <div><button type="submit" class="btn-reply text-uppercase">remove</button></div>
+                                        {% endif %}
+                                    </form>
+                                        
+                                    
                                 </div>
+                                
                             </div>
                         </div>
                     {% endfor %}

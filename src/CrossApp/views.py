@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views.generic import TemplateView, View, CreateView, ListView, UpdateView, DeleteView
 from hitcount.views import HitCountDetailView 
 from django.views.generic.edit import FormMixin
-from django.shortcuts import render, redirect,reverse
+from django.shortcuts import render,redirect,reverse
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
 from .models import Comments, MyUser
@@ -19,7 +19,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_text
 from .tokens import generate_token
 from CrossApp.models import Create_Ad
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 class Website_Manager(TemplateView):
@@ -163,19 +163,19 @@ class All_User(ListView):
     model = MyUser
     template_name = 'come_on_app/users.html'
     context_object_name = 'users'
-
+    
     def get(self, request):
-        user_list = MyUser.objects.all()
-        paginator = Paginator(user_list, 4)  # Show 25 contacts per page.
+        blogger = MyUser.objects.all()       
+        paginator = Paginator(blogger, 1)  # Show 25 contacts per page.
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         return render(request, self.template_name, {'blogger': page_obj})
 
 
-class Update_User(View):
+class Update_User(LoginRequiredMixin,View):
     template_name = 'update-user.html'
     class_form = UpdateForm
-
+    login_url = 'login'
     def get(self, request):
         form = self.class_form()
         update_info = MyUser.objects.filter(pk=request.user.pk)    
@@ -186,8 +186,8 @@ class Update_User(View):
 
     def post(self, request):
         form = self.class_form(request.POST, request.FILES, instance=request.user)
+        update_info = MyUser.objects.filter(pk=request.user.pk)
         if form.is_valid():
-            messages.success(request, "Profil update with success")
             f = form.save(commit=False)
             f.username = form.cleaned_data['username']
             f.last_name = form.cleaned_data['last_name']
@@ -197,11 +197,10 @@ class Update_User(View):
             f.website = form.cleaned_data['website']
             f.job = form.cleaned_data['job']
             f.save()
-            return redirect('update-user')
-
-
-        
-        messages.error(request, "error")
+            messages.success(request, "Profil update with success")
+            return render(request, self.template_name, locals())
+            # return redirect('update-user')
+        messages.error(request,"Profil update with success")
         return render(request, self.template_name, locals())
 # class Update_User(UpdateView):
 #     template_name = 'update-user.html'
@@ -231,11 +230,12 @@ class Update_User(View):
     #         messages.error(request, "error")
     #         return render(request, self.template_name, locals())
 
-class CreateAdForm_View(CreateView):
+class CreateAdForm_View(LoginRequiredMixin,CreateView):
     model = Create_Ad
     template_name = "create_ad.html"
     form_class = AdForm
-
+    login_url = 'login'
+    
     def form_valid(self, form):
         self.object = form.save(commit=False)
         self.object.author = self.request.user
@@ -247,22 +247,25 @@ class CreateAdForm_View(CreateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
-        return reverse("create_ad")
+        messages.success(self.request,'AD CREATE SUCCESS')
+        return reverse("myblog")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['button_text'] = "Create"
         context['method_ad'] = "Create Your Ad"
-        context['last_method'] = "Update My Ad"
+        context['last_method'] = "Create My Ad"
         return context
 
 
-class AdUpdate_View(UpdateView):
+class AdUpdate_View(LoginRequiredMixin,UpdateView):
     model = Create_Ad
     template_name = "create_ad.html"
     form_class = AdForm
     context_object_name = 'blog'
-
+    login_url = 'login'
+    # self.kwargs['pk'] # recuperer pk de l objet a modifier
+    
     def form_valid(self, form):
         messages.success(self.request, "Ad Update Success")
         return super().form_valid(form)
@@ -272,7 +275,9 @@ class AdUpdate_View(UpdateView):
         return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_url(self):
-        return reverse("home")
+        return reverse("ad-edit", kwargs={'pk': self.kwargs.get('pk')})
+        # return reverse(f"ad/{self.kwargs['pk']}/edit/")
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -282,14 +287,24 @@ class AdUpdate_View(UpdateView):
         return context
 
 
-class AdDelete_View(DeleteView):
+class AdDelete_View(LoginRequiredMixin,DeleteView):
     model = Create_Ad
-    template_name = "delete_ad_view.html"
     context_object_name = "delete"
+    login_url = 'login'
     
     def get_success_url(self):
-        return reverse("home")
+        messages.success(self.request,'Ad remove success')
+        return reverse("myblog")  
 
+# class CommentDelete_View(LoginRequiredMixin,DeleteView):
+#     model = Comments
+#     template_name = "single_post.html"
+#     context_object_name = "delete"
+#     login_url = 'login'
+    
+#     def get_success_url(self):
+#         # return HttpResponseRedirect(self.request.META.get('HTTP_REFERER'))
+#         return HttpResponseRedirect(self.request.session['login'])
 # class PropertyView(View):
 #     model = Create_Ad
 #     template_name = "property.html"
@@ -302,9 +317,25 @@ class BlogView(ListView):
     template_name = "blog_page.html"
     context_object_name = "blog"
 
-    def get_context_data(self,**kwargs):
-        context = super().get_context_data(**kwargs) 
-        return context
+    def get(self,request):
+        search = request.GET.get('search')
+        blogger = Create_Ad.objects.all()
+        if search == "all":
+           blogger = Create_Ad.objects.all() 
+        if search == "rent":
+            blogger = blogger.filter(for_rent=True) 
+            print(blogger)
+        if search == "sale":
+            blogger = blogger.filter(on_sale=True)
+        paginator = Paginator(blogger, 2)  
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        
+        return render(request, self.template_name, {'user_manager': page_obj})
+
+    # def get_context_data(self,**kwargs):
+    #     context = super().get_context_data(**kwargs) 
+    #     return context
 
 class BlogDetailView(FormMixin,HitCountDetailView):
     model = Create_Ad
@@ -391,65 +422,96 @@ class BlogDetailView(FormMixin,HitCountDetailView):
     #     f.save()
     #     return super(BlogDetailView, self).form_valid(form)
     
-    
 
     def numbers_view(request):
         number = Comments.objects.filter(ad_comments=request.object)
         return number
 
+def del_comment(request,pk):
+        obj_comment = Comments.objects.filter(pk=pk)
+        print(obj_comment)
+        obj_comment.delete()
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 class ContactView(TemplateView):
     template_name = "contact.html"
-    
-class MyBlogView(View):
+
+   
+class MyBlogView(LoginRequiredMixin,View):
+    paginate = 3
     template_name = "myblog.html"
+    login_url = 'login'
     
     def get(self,request):
         myblog = Create_Ad.objects.filter(author=request.user.pk)
-        print(myblog)
-        return render(request, self.template_name, locals())
+        search = request.GET.get('search')
+        search_bar = request.GET.get('search_bar')
+        if search == "all":
+           myblog = Create_Ad.objects.all() 
+        if search == "rent":
+            myblog = myblog.filter(for_rent=True) 
+            print(myblog)
+        if search == "sale":
+            myblog = myblog.filter(on_sale=True)
+        # if search_bar !="":    
+        #     myblog = Create_Ad.objects.filter(titre__icontains=request.GET.get('search_bar')) 
+        # else:
+        #     myblog = Create_Ad.objects.filter(author=request.user.pk)  
+        paginator = Paginator(myblog, 2)  
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        paginator = Paginator(myblog, 1)  
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        return render(request, self.template_name, {'myblog':page_obj})
 
 class BloggerProfilView(View):
-    template_name = "users.html"
+    template_name = "profil_view.html"
 
     def get(self,request,pk):
         blogger_query = MyUser.objects.filter(pk=pk)
+        blogger_blog = Create_Ad.objects.filter(author=pk)
+        print(blogger_blog)
         return render(request, self.template_name, locals())
 
-class LogoutView(View):
+
+class LogoutView(LoginRequiredMixin,View):
+    login_url = 'login'
+
     def get(self, request):
         logout(request)
         return render(request,"index.html")
                 
-# def post(self,request,pk):
-#     if request.method == "POST":
-#         email = request.POST.get("email_contact")
-#         message = request.POST.get("area_message")
-#         print(message,email)
-#         seller = Create_Ad.objects.filter(pk=pk)
-#         for info in seller:
-#             email_seller = info.author.email
-#             username_seller = info.author.username
-#         print(email_seller)  
-#         current_site = get_current_site(request)
-#         email_subject = "Croospay Offer received "
-#         message2 = render_to_string('contact-seller.html', {
-            
-#             'name_seller': username_seller,
-#             'domain': current_site.domain,
-#             'message': message,
-#             'photo': request.user.photo.url,
-#             'name_client':request.user.username
-
-#         })
-#         email = EmailMessage(
-#             email_subject,
-#             message2,
-#             settings.EMAIL_HOST_USER,
-#             [email_seller],
-#         )
-#         email.content_subtype = "html"
-#         email.fail_silently = True
-#         email.send()
+def contact_client(self,request,pk):
+    if request.method == "POST":
+        email = request.POST.get("email_contact")
+        message = request.POST.get("area_message")
+        print(message,email)
+        seller = Create_Ad.objects.filter(pk=pk)
+        for info in seller:
+            email_seller = info.author.email
+            username_seller = info.author.username
+        print(email_seller)  
+        current_site = get_current_site(request)
+        email_subject = "Croospay Offer received "
+        message2 = render_to_string('contact_seller.html', {
         
-#         return redirect('home')
+            'name_seller': username_seller,
+            'domain': current_site.domain,
+            'message': message,
+            'photo': request.user.photo.url,
+            'name_client':request.user.username
+
+        })
+        email = EmailMessage(
+            email_subject,
+            message2,
+            settings.EMAIL_HOST_USER,
+            [email_seller],
+        )
+        email.content_subtype = "html"
+        email.fail_silently = True
+        email.send()
+    
+        return redirect('')
             

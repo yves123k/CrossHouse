@@ -25,7 +25,7 @@ class UpdateForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ("first_name", "last_name", "username", "photo", "phoneNumber", "description", "address",
-                  "website",'job',)
+                  "website",'job','photo')
 
 class AdForm(forms.ModelForm):
     class Meta:

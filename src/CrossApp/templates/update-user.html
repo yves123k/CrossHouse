@@ -28,37 +28,45 @@
             <div class="billing_details">
                 <div class="row">
                     <div class="col-lg-8">
-                        <h3>My Profil Data</h3>
-                        <form class="row contact_form" method="POST" >
+                        <h3 style="font-weight:800;font-size:30px;">My Profil Data</h3>
+                        <form class="row contact_form" method="POST" enctype="multipart/form-data" >
                             {% csrf_token %}
                             {% for info in update_info %}
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000"> Username </label>
                                 {% render_field form.username class="form-control" value=info.username  %}
                             </div>
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">First name</label>
                                 {% render_field form.first_name class="form-control" value=info.first_name  %}
                                 
                             </div>
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000" >Last name</label>
                                 {% render_field form.last_name class="form-control" value=info.last_name  %}
                             </div>
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">Job</label>
                                 {% render_field form.job class="form-control" value=info.job  %}
                                 <!-- <input type="text" class="form-control" id="zip" name="zip" value={{user.date_joined}} disabled> -->
                                 
                             </div>
                             
-                            <div class="col-md-12 form-group">
+                            <!-- <div class="col-md-12 form-group">
+                                <label for="tilte">Email</label>
                                 {% render_field form.email class="form-control" value=info.email  %}
-                            </div>
+                            </div> -->
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">PhoneNumber</label>
                                 {% render_field form.phoneNumber class="form-control" value=info.phoneNumber %}
                             </div>
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">Website</label>
                                 {% render_field form.website class="form-control" value=info.website  %}
                             </div>
     
                             <div class="col-md-12 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">Email</label>
                                 <input type="email" class="form-control" value={{info.email}} disabled>
                                 <!-- {% render_field form.address class="form-control" placeholder="Email"  %} -->
                             </div>
@@ -73,7 +81,7 @@
                                   
                             </div>
                             {% endfor %}
-                        </form>
+                        
                     </div>
                     <div class="col-lg-4">
                         <div class="blog_right_sidebar">
@@ -92,6 +100,8 @@
                                 {% else %}
                                     <div style="border-radius:40%"> <img style=" width: 120px;height: 120px;border: 1px solid #000;border-radius:50%" id="img_profil" src="{% static 'img/user.png' %}"/> </div>
                                 {% endif %}
+                                {% render_field form.photo class="form-control" %}
+                            </form>    
                                 <h4>{{user.username}}</h4>
                                 <p>{{user.job}}</p>
                                 <div class="social_icon">
@@ -144,7 +154,7 @@
     </section>
     {% for message in messages %}
         {% if message.tags == 'success' %}
-            <script src="{% static 'sweetalert.min.js' %}"></script>
+                <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
                     <link rel="stylesheet" href="{% static 'style_modal.css' %}">
                     <script>
                         swal({
@@ -155,13 +165,13 @@
                             });
                     </script> 
         {% else %}
-            <script src="{% static 'sweetalert.min.js' %}"></script>
+            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
             <link rel="stylesheet" href="{% static 'style_modal.css' %}">
             <script>
                 swal({
                     title: "{{message}}",
                     text: "{{message}}",
-                    icon: "error",
+                    icon: "success",
                     button: "success",
                     });
             </script>
@@ -169,6 +179,17 @@
     {% endfor %}
     <script>
         document.getElementById("id_description").value = "{{user.description}}";
+    </script>
+    <script>
+        var Element = document.getElementById('id_photo');
+        var img = document.getElementById("img_profil");
+        Element.addEventListener('change', function() {
+        var url = URL.createObjectURL(Element.files[0]);
+        img.src = url;
+        console.log(url);
+         //   var d=document.querySelector(".p");
+         //   d.textContent+=url;
+     });
     </script>
     <!--================End Checkout Area =================-->
 

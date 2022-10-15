@@ -28,32 +28,39 @@
             <div class="billing_details">
                 <div class="row">
                     <div class="col-lg-8">
-                        <h3>Blogger Data</h3>
+                        <h3 style="color:black ;font-weight: 800;font-size:30px ;">Blogger Data</h3>
                         <form class="row contact_form" method="POST" >
                             {% csrf_token %}
                             {% for info in blogger_query %}
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">Username</label>
                                 <input type="text" class="form-control" value="{{info.username}}" disabled>
                             </div>
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">First Name</label>
                                 <input type="text" class="form-control" value="{{info.first_name}}" disabled>  
                             </div>
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">Last Name</label>
                                 <input type="text" class="form-control" value="{{info.last_name}}" disabled>
                             </div>
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">Job</label>
                                 <input type="text" class="form-control" value="{{info.job}}" disabled>
     
                             </div>
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">PhoneNumber</label>
                                 <input type="text" class="form-control" value="{{info.phoneNumber}}" disabled>
                             </div>
                             <div class="col-md-6 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">Website</label>
                                 <input type="text" class="form-control" value="{{info.website}}" disabled>
                                 
                             </div>
     
                             <div class="col-md-12 form-group p_star">
+                                <label for="tilte" style="font-weight:500;color:#000">Email</label>
                                 <input type="email" class="form-control" value="{{info.email}}" disabled>
                                 <!-- {% render_field form.address class="form-control" placeholder="Email"  %} -->
                             </div>
@@ -79,8 +86,8 @@
                                 <div class="br"></div>
                             </aside>
                             <aside class="single_sidebar_widget author_widget">
-                                {% if user.photo  %}
-                                    <div style="border-radius:40%"> <img style=" width: 120px;height: 120px;border: 1px solid #000;border-radius:50%" id="img_profil" src="{{user.photo.url}}"/> </div>
+                                {% if info.photo  %}
+                                    <div style="border-radius:40%"> <img style=" width: 120px;height: 120px;border: 1px solid #000;border-radius:50%" id="img_profil" src="{{info.photo.url}}"/> </div>
                                 {% else %}
                                     <div style="border-radius:40%"> <img style=" width: 120px;height: 120px;border: 1px solid #000;border-radius:50%" id="img_profil" src="{% static 'img/user.png' %}"/> </div>
                                 {% endif %}
@@ -98,24 +105,17 @@
                             </aside>
                             <aside class="single_sidebar_widget popular_post_widget">
                                 <h3 class="widget_title">My Ads</h3>
+                                {% for ad in blogger_blog %}
                                 <div class="media post_item">
-                                    <img src="{% static 'img/blog/popular-post/post1.jpg' %}" alt="post">
+                                    <img style="width:100px;height:60px" src="{{ ad.image.url }}" alt="post">
                                     <div class="media-body">
-                                        <a href="blog-details.html">
-                                            <h3>Space The Final Frontier</h3>
+                                        <a href="{% url 'blog_detail' ad.id %}">
+                                            <h3>{{ ad.titre }}</h3>
                                         </a>
-                                        <p>02 Hours ago</p>
+                                        <p>{{ ad.date_created }}</p>
                                     </div>
                                 </div>
-                                <div class="media post_item">
-                                    <img src="{% static 'img/blog/popular-post/post2.jpg' %}" alt="post">
-                                    <div class="media-body">
-                                        <a href="blog-details.html">
-                                            <h3>The Amazing Hubble</h3>
-                                        </a>
-                                        <p>02 Hours ago</p>
-                                    </div>
-                                </div>
+                                {% endfor %}
                                 <div class="br"></div>
                             </aside>
                             <aside class="single_sidebar_widget ads_widget">

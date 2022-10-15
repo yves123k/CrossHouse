@@ -30,7 +30,7 @@
                     <div class="categories_details">
                         <div class="categories_text">
                             <a href="blog-details.html">
-                                <h5 style="color:black ;">My Blog Manager</h5>
+                                <h5 style="color:black ;font-weight: 800;font-size:30px ;">My Blog Manager</h5>
                             </a>
                         </div>
                     </div>
@@ -52,16 +52,17 @@
                             <div class="col-md-3">
                                 <div class="blog_info text-right">
                                     <div class="post_tag">
-                                        <a href="#">Food,</a>
-                                        <a class="active" href="#">Technology,</a>
-                                        <a href="#">Politics,</a>
-                                        <a href="#">Lifestyle</a>
+                                        {% if blog.for_rent %}
+                                            <span class="d-inline-block bg-success text-white px-3 mb-3 property-offer-type rounded">For Rent</span>
+                                        {% endif %}    
+                                        {% if blog.on_sale %}
+                                            <span class="d-inline-block bg-danger text-white px-3 mb-3 property-offer-type rounded">For Sale</span>    
+                                        {% endif %}
                                     </div>
                                     <ul class="blog_meta list">
                                         <li><a href="#">{{ blog.author.username}}<i class="lnr lnr-user"></i></a></li>
                                         <li><a href="#">{{ blog.date_created}}<i class="lnr lnr-calendar-full"></i></a></li>
                                         <li><a href="#">{% get_hit_count for blog %} Views<i class="lnr lnr-eye"></i></a></li>
-                                        <li><a href="#">{{ comments }}comments<i class="lnr lnr-bubble"></i></a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -77,9 +78,12 @@
                                             <h2>{{ blog.titre }}</h2>
                                         </a>
                                         <p>{{ blog.more_info|truncatewords_html:25|safe }}</p>
-                                        <a href="{% url 'blog_detail' blog.pk %}" class="white_bg_btn">View More</a>
-                                        <a href="{% url 'ad-edit' blog.pk %}" class="white_bg_btn">Modify Ad</a>
-                                        <a  style="background-color:rgb(212, 105, 105);color:white;" href="{% url 'delete_ad' blog.pk %}" class="white_bg_btn">Remove Ad</a>
+                                        <form method="POST" action="{% url 'delete_ad' blog.pk %}">
+                                            {% csrf_token %}
+                                            <a href="{% url 'blog_detail' blog.pk %}" class="white_bg_btn">View More</a>
+                                            <a href="{% url 'ad-edit' blog.pk %}" class="white_bg_btn">Modify Ad</a>
+                                            <a><button style="background-color:rgb(212, 105, 105);" type="submit" class="white_bg_btn">Remove Ad</button></a> 
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -87,25 +91,49 @@
                     {% endfor %}
                     <nav class="blog-pagination justify-content-center d-flex">
                         <ul class="pagination">
-                            <li class="page-item">
-                                <a href="#" class="page-link" aria-label="Previous">
+                            {% if myblog.has_previous %}
+                                <a href="?page={{ myblog.previous_page_number }}" class="page-link" aria-label="Previous">
                                     <span aria-hidden="true">
                                         <span class="lnr lnr-chevron-left"></span>
                                     </span>
                                 </a>
-                            </li>
-                            <li class="page-item"><a href="#" class="page-link">01</a></li>
-                            <li class="page-item active"><a href="#" class="page-link">02</a></li>
-                            <li class="page-item"><a href="#" class="page-link">03</a></li>
-                            <li class="page-item"><a href="#" class="page-link">04</a></li>
-                            <li class="page-item"><a href="#" class="page-link">09</a></li>
-                            <li class="page-item">
-                                <a href="#" class="page-link" aria-label="Next">
+                            {% else %}
+                                <a class="page-link" aria-label="Previous">
                                     <span aria-hidden="true">
-                                        <span class="lnr lnr-chevron-right"></span>
+                                        <span class="lnr lnr-chevron-left"></span>
                                     </span>
                                 </a>
-                            </li>
+                            {% endif %}
+                            {% for i in myblog.paginator.page_range %}
+                                {% if myblog.number == i %}
+                                    <li class="page-item active"><a class="page-link">{{ i }}</a></li>
+                                {% else %}
+                                    <li class="page-item {% if request.path == '/?page={{ i }}/' %} page-link active {% endif %}"><a  href="?page={{ i }}" class="page-link">{{ i }}</a></li>
+                                    <!-- <li class="page-item d-none d-md-block"><a id="datatablePagination1" class="{% if request.path == '/?page={{ i }}/' %} page-link active {% endif %}" href="?page={{ i }}">{{ i }}</a> -->
+
+<!--                                          <li class="page-item d-none d-md-block"><a id="datatablePaginationPage0" data-dt-page-to="0"  class="{% if request.path == '/?page={{ i }}/' %} page-link active {% endif %}" href="?page={{ i }}">{{ i }}</a></li>-->
+                                {% endif %}
+                            {% endfor %}
+                            {% if myblog.has_next %}
+                                <li class="page-item">
+                                    <a href="?page={{ myblog.next_page_number }}" class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">
+                                            <span class="lnr lnr-chevron-right"></span>
+                                        </span>
+                                    </a>
+                                </li>
+                                <!-- <li class="page-item"><a id="datatablePaginationNext" class="page-link" href="?page={{ user_manager.next_page_number }}" aria-label="Next"><i class="gd-angle-right icon-text icon-text-xs d-inline-block"></i></a></li> -->
+<!--                                        <li class="page-item d-none d-md-block"><a id="datatablePaginationPage0" href="?page={{ user_manager.next_page_number }}">&raquo;</a></li>-->
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">
+                                            <span class="lnr lnr-chevron-right"></span>
+                                        </span>
+                                    </a>
+                                </li>
+                                <!-- <li class="page-item d-none d-md-block"><a id="datatablePaginationPage0" class="disabled"><span>&raquo;</span></a></li> -->
+                            {% endif %}
                         </ul>
                     </nav>
                 </div>
@@ -113,20 +141,22 @@
             <div class="col-lg-3">
                 <div class="blog_right_sidebar">
                     <aside class="single_sidebar_widget search_widget">
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Search Posts" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Search Posts'">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button"><i class="lnr lnr-magnifier"></i></button>
-                            </span>
-                        </div><!-- /input-group -->
+                        <form action="">
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="search_bar" placeholder="Search Posts" value="{{request.GET.titre}}" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Search Posts'">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="submit"><i class="lnr lnr-magnifier"></i></button>
+                                </span>
+                            </div><!-- /input-group -->
+                        </form>
                         <div class="br"></div>
                     </aside>
                     <aside class="single-sidebar-widget tag_cloud_widget" style="margin-bottom:70px;">
                         <h4 class="widget_title">Tag Clouds</h4>
                         <ul class="list">
-                            <li><a href="#">All</a></li>
-                            <li><a href="#">Rent</a></li>
-                            <li><a href="#">Sale</a></li> 
+                            <li><a href="?search=all">all</a></li>
+                            <li><a href="?search=rent">rent</a></li>
+                            <li><a href="?search=sale">Sale</a></li> 
                         </ul>
                     </aside>
                     
@@ -136,4 +166,29 @@
         </div>
     </div>
 </section>
+{% for message in messages %}
+        {% if message.tags == 'success' %}
+            <script src="{% static 'sweetalert.min.js' %}"></script>
+                    <link rel="stylesheet" href="{% static 'style_modal.css' %}">
+                    <script>
+                        swal({
+                            title: "{{message}}",
+                            text: "{{message}}",
+                            icon: "success",
+                            button: "success",
+                            });
+                    </script> 
+        {% else %}
+            <script src="{% static 'sweetalert.min.js' %}"></script>
+            <link rel="stylesheet" href="{% static 'style_modal.css' %}">
+            <script>
+                swal({
+                    title: "{{message}}",
+                    text: "{{message}}",
+                    icon: "error",
+                    button: "success",
+                    });
+            </script>
+        {% endif %}
+    {% endfor %}
 {% endblock content %}

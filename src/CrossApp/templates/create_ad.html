@@ -28,12 +28,12 @@
             <div class="billing_details">
                 <div class="row">
                     <div class="col-lg-8">
-                        <h3>{{last_method}}</h3>
+                        <h3 style="font-weight:800;font-size:30px;">{{last_method}}</h3>
                         <form class="row contact_form" method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
-                            <div class="col-md-12 form-group p_star">
-                                
-                                <img style="width:100%;height:100%;max-height:487px;" id="img-ad" src="{{ blog.image.url }}">   
+                            <div class="col-md-12 form-group p_star" id="div_show">
+                                              
+                                <img style="width:100%;height:100%;max-height:487px;" id="img-ad" src="{% static 'img/banner/banner-bg.jpg' %}">   
                             </div>
                             <div class="col-md-12 form-group p_star">
                                 {% render_field form.image class="form-control" %}   
@@ -131,7 +131,7 @@
                                 <p>{{ user.description }}</p>
                                 <div class="br"></div>
                             </aside>
-                            <aside class="single_sidebar_widget popular_post_widget">
+                            <!-- <aside class="single_sidebar_widget popular_post_widget">
                                 <h3 class="widget_title">My Ads</h3>
                                 <div class="media post_item">
                                     <img src="{% static 'img/blog/popular-post/post1.jpg' %}" alt="post">
@@ -156,7 +156,7 @@
                             <aside class="single_sidebar_widget ads_widget">
                                 <a href="#"><img class="img-fluid" src="{% static 'img/blog/add.jpg' %}" alt=""></a>
                                 <div class="br"></div>
-                            </aside>
+                            </aside> -->
                             
                             
                             
@@ -170,6 +170,31 @@
             </div>
         </div>
     </section>
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+                <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+                    <link rel="stylesheet" href="{% static 'style_modal.css' %}">
+                    <script>
+                        swal({
+                            title: "{{message}}",
+                            text: "{{message}}",
+                            icon: "success",
+                            button: "success",
+                            });
+                    </script> 
+        {% else %}
+            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+            <link rel="stylesheet" href="{% static 'style_modal.css' %}">
+            <script>
+                swal({
+                    title: "{{message}}",
+                    text: "{{message}}",
+                    icon: "success",
+                    button: "success",
+                    });
+            </script>
+        {% endif %}
+    {% endfor %}
     <!--================End Checkout Area =================-->
     <script>
         var Element = document.getElementById('id_image');
@@ -181,13 +206,5 @@
          //   var d=document.querySelector(".p");
          //   d.textContent+=url;
      });
-     function view() {
-        var Element = document.getElementById('id_image');
-        var img = document.getElementById("img-ad");
-        
-        var url = URL.createObjectURL(Element.files[0]);
-        img.src = url;
-        console.log(url);}
-        view()
     </script> 
 {% endblock %}

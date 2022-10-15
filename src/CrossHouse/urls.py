@@ -19,15 +19,15 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
-from CrossApp.views import AdDelete_View, AdUpdate_View, BlogDetailView, BlogView, BloggerProfilView, LogoutView, MyBlogView, Website_Manager, Login, Signup, All_User, Update_User,Admin_Register_User,\
-    email_validate_view,activate,CreateAdForm_View,ContactView
+from CrossApp.views import AdDelete_View, AdUpdate_View, BlogDetailView, BlogView, BloggerProfilView,LogoutView, MyBlogView, Website_Manager, Login, Signup, All_User, Update_User,Admin_Register_User,\
+    email_validate_view,activate,CreateAdForm_View,ContactView,del_comment
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', Website_Manager.as_view(template_name='index.html'), name='home'),
     path('login/', Login.as_view(template_name='login.html'), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('view_profil/<int:pk>/user', BloggerProfilView.as_view(template_name="profil_view.html"), name='view_profil'),
+    path('view_profil/<int:pk>/user', BloggerProfilView.as_view(), name='view_profil'),
     path('update-user/', Update_User.as_view(), name='update-user'),
     path('register/', Signup.as_view(), name='register'),
     path('all_user/', All_User.as_view(template_name='users.html'), name='users'),
@@ -42,6 +42,7 @@ urlpatterns = [
     path('blog/<int:pk>/detail/',BlogDetailView.as_view(), name='blog_detail'),
     path('contact/',ContactView.as_view(), name='contact'),
     path('myblog/',MyBlogView.as_view(), name='myblog'),
+    path('delete/<int:pk>/comment', del_comment, name ='delete_comment'),
     path('contact_seller/',Website_Manager.as_view(template_name='contact_seller.html'), name='contact_seller'),
     # path('blog/blog_rdv/',valide_rdv, name='blog_rdv'),
     ]
