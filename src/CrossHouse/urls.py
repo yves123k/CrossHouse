@@ -19,10 +19,18 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
-from CrossApp.views import AdDelete_View, AdUpdate_View, BlogDetailView, BlogView, BloggerProfilView,LogoutView, MyBlogView, Website_Manager, Login, Signup, All_User, Update_User,Admin_Register_User,\
+from CrossApp.views import AdDelete_View, AdUpdate_View, BlogDetailView, BlogView, BloggerProfilView, ListAdminViewSet,LogoutView, MyBlogView, Website_Manager, Login, Signup, All_User, Update_User,Admin_Register_User,\
     email_validate_view,activate,CreateAdForm_View,ContactView,del_comment
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register('list_admin',ListAdminViewSet)
+
+
+
 
 urlpatterns = [
+    path('api/', include(router.urls)),
     path('admin/', admin.site.urls),
     path('home/', Website_Manager.as_view(template_name='index.html'), name='home'),
     path('login/', Login.as_view(template_name='login.html'), name='login'),

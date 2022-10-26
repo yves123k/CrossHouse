@@ -8,6 +8,9 @@ from django.views.generic.edit import FormMixin
 from django.shortcuts import render,redirect,reverse
 from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
+from itsdangerous import Serializer
+
+from CrossApp.serializers import AdminListSerialiser
 from .models import Comments, MyUser
 from .forms import AdForm, FormComment, LoginForm, SignupForm, UpdateForm, formAc,FormContact
 from django.contrib import messages
@@ -20,8 +23,9 @@ from django.utils.encoding import force_bytes, force_text
 from .tokens import generate_token
 from CrossApp.models import Create_Ad
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from rest_framework import viewsets
 # Create your views here.
+
 class Website_Manager(TemplateView):
     template_name = "index.html"
 
@@ -171,6 +175,7 @@ class All_User(ListView):
         page_obj = paginator.get_page(page_number)
         return render(request, self.template_name, {'blogger': page_obj})
 
+    
 
 class Update_User(LoginRequiredMixin,View):
     template_name = 'update-user.html'
@@ -514,4 +519,7 @@ def contact_client(self,request,pk):
         email.send()
     
         return redirect('home')
-            
+
+class ListAdminViewSet(viewsets.ModelViewSet):
+    queryset = MyUser.objects.all() 
+    serializer_class = AdminListSerialiser          
